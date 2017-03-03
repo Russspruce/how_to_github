@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>How-To: Github API</title>
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css'>
+    <link rel="stylesheet" href="styles.css" type="text/css">
+    <link rel="stylesheet" href="animate.css" type="text/css">
+  </head>
+  <body>
+
+    <div id="guide_title" align="center">
+      <div class="title_left animated bounceInLeft">
+        <h1>How-To:</h1>
+      </div>
+      <div class="animated fadeIn" align="center">
+        <img src="img/gh-256.png" alt="github icon">
+      </div>
+      <div class="title_right animated bounceInRight">
+        <h1>GitHub</h1>
+      </div>
+    </div>
+
+      <br><br>
+      <div class="container" align="center">
+        <h2>Welcome</h2>
+        <p>This guide will cover how to user the GitHub API to pull user information, and then have it display the stats using node plugins such as Gulp and Bower.  First, lets cover the basics of what GitHub is.</p>
+
+        <h2>What is GitHub?</h2>
+
+        <p>GitHub is an web-based version control service that uses Git to allow users to create repositories, make changes, and have multiple people work on the same project while creating branches and marking changes.  With over 14 million users, it is a widely used service that is used by companies and individuals alike.</p>
+
+
+
+        <h2>What is an API?</h2>
+        <p>An API, or application programming interface, is a set of routines, protocols and tools used in building software apps.  It helps specify how the components in each software program should interact and display in the program.  There are a variety of different APIs that each do their own thing, from Libraries and Frameworks, Web APIs, Remote APIs, and Operating Systems.<br>
+        For this guide, we will be using a Web API, that will be pulling information from server-side endpoints to allow us to pull information as either Extensible Markup Language(XML), or Javascript Object Notions(JSON).  With permission, we can access information from these websites, and create web apps to allow us to search and display the requests made.  For what we are going to do, we will be requesting JSON from the API, and will display through a UI interface.</p>
+
+        <h2>Getting The GitHub API Key</h2>
+
+        <p>Before we begin, make sure you are registered and logged in to GitHub.  Once logged in, you must do the following:</p>
+
+
+        <div class="container">
+          <div class="row">
+            <div class="col-md-4">
+              <ul align="left">
+                <li>Go to the top corner and select your user icon.</li>
+                <li>In the drop down menu, select <em>Settings</em></li>
+                <li>In <em>Settings</em>, scroll down the left menu until you find the <em>Developers settings</em></li>
+                <li>There, you should see the option "Personal access tokens", which will be what we need to create our API Key.</li>
+                <li>Select "Generate Token", where you will see a form like the one to the left.</li>
+                <li>Do not select any options. This will make it a <em>pulic access</em> token.</li>
+              </ul>
+
+            </div>
+            <div class="col-md-8">
+              <img src="img/token_form.png" alt="token_menu" width="400px">
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <h2>What is an API Key?</h2>
+        <p>The API Key is a special token that allows for access to the library and resources of the API.  Each API key is different as it is used to identify who is accessing the information, and how many calls are made.<br>For our API Key, you can see below that we have generated one, and that we will have to copy it before we exit out.  If we lose the key, we will need to generate a new one for security reasons.</p><br>
+
+        <img src="img/api-key.png" alt="api_key" width="100%">
+        <br><br>
+        <p>We will use this API Key in a moment, but for now, let's go ahead and start creating our web application.</p>
+
+        <h2>Setting up our Project</h2>
+<br>
+        <p>Now that we have our API Key, we can now go ahead and start work on creating a web app for our API Key.  To begin, let's create the folders:<br>
+
+          <pre>
+            github-api/
+            ├── js/
+            │   ├── github-interface.js
+            │   └── github.scss
+            ├── scss/
+            │   └── styles.scss
+            └── index.html
+          </pre><br>
+        For now, don't worry about what the files will be, we will get to those soon.  For now, in the command line enter in: <span class="command_line">$npm init</span>.<br>Go thorugh the list entering in the info, and in the end, you will have a package.json file that looks like the following: </p>
+
+        <pre>{
+          "name": "github-page",
+          "version": "1.0.0",
+          "description": "Demo to show GitHub API",
+          "main": "index.js",
+          "scripts": {
+            "test": "echo \"Error: no test specified\" && exit 1"
+          },
+          "keywords": [
+            "GitHub",
+            "API"
+          ],
+          "author": "OSU student",
+          "license": "ISC"
+        }</pre>
+
+        Once this is completed we will install a node package that will help us with building our app called Gulp.
+
+
+      </div>
+
+      <h2>So what is gulp.js?</h2>
+<div class="container info_text">
+gulp helps with optimizing and automating the code and other node packages, helping with directing and running different programs with minimal effort.  It acts much like an air traffic controller, helping direct what each plugin and module does, and prevents them from going ahead or causing any errors and crashes.  This helps save a lot of time working on time-consuming and repetitive tasks, and can free up more time for working on other parts of the program.
+
+
+While we are also saving it to the project, we should install it globally so that we can use gulp in our terminal.  this can be done by entering in <span class="command_line">$ npm install gulp -g</span> into the command line.
+
+Next, we will need to install our next package, browserify.
+<br>
+<br>
+</div>
+<div class="container">
+<pre>
+$ npm install browserify --save-dev
+</pre>
+</div>
+<div class="container info_text">
+Browserify allows for export and required to be translated from the browser into javascript, which will be used by node.js to use that info to execute our call.
+
+
+Along with browserify, we will install several other modules that will be used for this project, and can be used in other projects as well.  Go ahead and enter in the following into the command line:
+</div>
+<br><br>
+<div class="container">
+  <pre>
+$ npm install vinyl-source-stream --save-dev
+$ npm install gulp-concat --save-dev
+$ npm install gulp-uglify --save-dev
+$ npm install gulp-util --save-dev
+$ npm install del --save-dev
+$ npm install jshint --save-dev
+$ npm install gulp-jshint --save-dev
+  </pre>
+</div>
+
+
+
+<div class="container info_text">
+As you may have noticed when we saved the module, -dev was added onto the end.  This let’s our program know gulp will be saved as a development dependency, which means it will be used for app development and build process rather than in our production.  By separating these dependencies to development and production, it will allow our final, app to run faster once completed.
+<br>
+Now for what each of these packages do, they help us able to run and have our program able to perform tasks that are required and can allow our project to run.
+<br>
+They do the following:<br>
+<ul>
+<li>vinyl-source-stream: Takes browserified code and places it into a new file as the program runs.</li>
+<li>concat: Consolidates all js files into a single script tag, reducing loading time.</li>
+<li>uglify: Removes unnecessary characters from concatenated files.</li>
+<li>utility: Allows gulp build of either development or production app.</li>
+<li>del: Cleans up environment before a build by deleting build and tmp folders.</li>
+<li>jshint: Helps spot errors in files and indicating what the problem is.</li>
+</ul>
+<br>
+Now that we have all of these installed, we need to create a task for each module to the gulpfile.js in order for it to run properly and function as we want them to.
+<br>
+As stated before, browserify requires us to have each installed module be required variables, allowing us to set it at the top of out file.  Once we have all our required variables, we can start creating tasks for each one, and have them run the necessary code.  See below the code for our gulpfile, as well as notes for what each task is, and what each part of the task does.
+</div>
+<div class="container">
+<p data-height="350" data-theme-id="0" data-slug-hash="QpjZKq" data-default-tab="js" data-user="russspruce" data-embed-version="2" data-pen-title="Gulpfile" class="codepen">See the Pen <a href="http://codepen.io/russspruce/pen/QpjZKq/">Gulpfile</a> by Andrew Russo (<a href="http://codepen.io/russspruce">@russspruce</a>) on <a href="http://codepen.io">CodePen</a>.</p>
+<script async src="https://production-assets.codepen.io/assets/embed/ei.js"></script></div>
+
+
+<div class="container info_text">
+Next, let’s create our form for submitting a username.  Once submitted, it will allow us to be able to access the GitHub API, and display that info.  Let’s now worry about that for now, and create the form:</div>
+
+<div class="container">
+  <pre>
+  &lt;head&gt;
+  &lt;script type="text/javascript" src="build/js/app.js"&gt;&lt;/script&gt;
+  &lt;title&gt;GitHub&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div class="container"&gt;
+     &lt;h1&gt;Find Github repositories!&lt;/h1&gt;
+     &lt;div class="gitSearch"&gt;
+       &lt;label for="username"&gt;Enter a username:&lt;/label&gt;
+       &lt;br&gt;
+       &lt;input class="form-control" id="username" type="text" name="username"&gt;
+       &lt;br&gt;
+       &lt;button class="btn" id = "githubSearch"&gt;Search&lt;/button&gt;
+     &lt;/div&gt;
+   &lt;/div&gt;
+  </pre>
+</div>
+<div class="container info_text">
+As you may have noticed, for our &lt;script&gt; tag, we have in the code the following:
+</div>
+<div class="container">
+  <pre>
+  &lt;script type="text/javascript" src=“build/js/app.js"&gt;&lt;/script&gt;
+  </pre>
+</div>
+<div class="container info_text">
+Thanks to having Browserfy, we only need to make one call to our js file to have it run.
+
+<br>
+<br>
+
+Now that we have our gulpfile and a form, let’s start by creating the javascript files that will allow us to communicate with the web API, and get the JSON to display.  But before we do that, we need to be able to have it so that our frontend js will be separate from our backend js.  The main reason we want to keep these two parts separated is that it allows us to be able to keep everything organized, prevent any kind of version conflict that may be required for one end, and help optimize each side of the program to function at it’s highest capacity.  So, to help us with creating the frontend/backend, we will be using Bower to help us build and run the frontend.
+</div>
+
+<h2>What is Bower?</h2>
+<div class="container info_text">
+Bower is another package manager, like npm, used to help install frontend packages like jQuery and Bootstrap.  Another useful ability for bower is that it is not only limited to Node, but can be used with other frameworks, like AngularJS and Ruby on Rails.
+<br>
+To begin, let’s install bower globally with <span class="command_line">$ npm install bower -g</span>, following up by entering in <span class="command_line">bower init</span> into the command line to create a bower.json file.  It will copy a lot of the info that already exists in our package.json file, but we can skip all those steps by just hitting Enter to have everything set up as default.
+<br><br>
+Now that we have our bower.json file set up, we can now install frontend dependencies, starting with jQuery.  This can be done by entering in <span class="command_line">$ bower install jquery --save</span> into pir command line to download the packages and save them onto our local machine, much like how node_modules works.  Another added benefit is that now that we have the necessary files saved locally, we don’t need to do any CDN calls that we would otherwise rely on.  This can be put into the header of our HTML page as the following:
+</div>
+<div class="container">
+  <pre>
+&lt;script src="bower_components/jquery/dist/jquery.min.js"&gt;&lt;/script&gt;
+</pre>
+</div>
+<div class="container">
+Next, let’s install Bootstrap with $ bower install bootstrap —save, and enter in the following in our form:
+<pre>
+&lt;link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css"&gt;
+&lt;script src="bower_components/bootstrap/dist/js/bootstrap.min.js"&gt;&lt;/script&gt;
+</pre>
+
+
+We should now have a solid HTML page:
+</div>
+<br>
+<div class="container">
+<p data-height="265" data-theme-id="0" data-slug-hash="dvMJbR" data-default-tab="html" data-user="russspruce" data-embed-version="2" data-pen-title="Bower_HTML" class="codepen">See the Pen <a href="http://codepen.io/russspruce/pen/dvMJbR/">Bower_HTML</a> by Andrew Russo (<a href="http://codepen.io/russspruce">@russspruce</a>) on <a href="http://codepen.io">CodePen</a>.</p>
+<script async src="https://production-assets.codepen.io/assets/embed/ei.js"></script>
+</div>
+
+<div class="container info_text">
+But once again, we are starting to have a lot of &lt;script&gt; and &lt;link&gt; tags in our HTML page, which can slow us down.  To help solve this, we can use npm to  install bower-files to help.
+</div>
+<div class="container">
+  <pre>
+$ npm install bower-files --save-dev</pre>
+</div>
+<div class="container info_text">
+We will also create another gulp task and required variable:
+</div>
+<div class="container">
+  <pre>
+var lib = require('bower-files')();
+
+gulp.task('bowerJS', function () {
+  return gulp.src(lib.ext('js').files)
+    .pipe(concat('vendor.min.js'))
+    .pipe(uglify())
+    .pipe(gulp.dest('./build/js'));
+});
+</pre>
+</div>
+<div class="container info_text">
+Once completed, we can replace the previous &lt;script&gt; links with the following:
+</div>
+<div class="container">
+  <pre>
+&lt;script src="build/js/vendor.min.js"&gt;&lt;/script&gt;
+</pre>
+</div>
+<div class="container info_text">
+We can also replace the bootstrap &lt;link&gt; with this one:</div>
+<div class="container">
+  <pre>
+&lt;link rel="stylesheet" href="build/css/vendor.css"&gt;
+</pre>
+</div>
+<div class="container info_text">
+As with all packages going through gulp, a task is required as well:
+</div>
+<div class="container">
+  <pre>
+gulp.task('bowerCSS', function () {
+  return gulp.src(lib.ext('css').files)
+    .pipe(concat('vendor.css'))
+    .pipe(gulp.dest('./build/css'));
+});</pre></div>
+<div class="container info_text">
+It should be noted that there is a difference with this task, as it is looking for files that end in .css, so we need to modify our <span id=“varlib”>var lib</span> to be able to call and pass the Bootstrap files through the bower-files package, resulting in the following:</div>
+<div class="container">
+  <pre>
+var lib = require('bower-files')({
+  "overrides":{
+    "bootstrap" : {
+      "main": [
+        "less/bootstrap.less",
+        "dist/css/bootstrap.css",
+        "dist/js/bootstrap.js"
+      ]
+    }
+  }
+});</pre></div>
+<div class="container info_text">
+We can also create a task to allow these two Bower tasks to run simultaneously, since they won’t cause any issues:</div>
+<div class="container">
+  <pre>
+gulp.task('bower', ['bowerJS', ‘bowerCSS']);
+</pre></div>
+
+<div class="container info_text">
+Finally, we will need to change our build task so that it will run bower next time we do a build, giving us the following changes:</div>
+<div class="container">
+  <pre>
+gulp.task('build', ['clean'], function(){
+  if (buildProduction) {
+    gulp.start('minifyScripts');
+  } else {
+    gulp.start('jsBrowserify');
+  }
+  gulp.start('bower');
+});</pre></div>
+
+<div class="container info_text">
+After all of this, we should have our new gulpfile.js that should look like so:
+</div>
+<div class="container">
+  <p data-height="350" data-theme-id="0" data-slug-hash="mWegPa" data-default-tab="js" data-user="russspruce" data-embed-version="2" data-pen-title="Gulpfile_bower" class="codepen">See the Pen <a href="http://codepen.io/russspruce/pen/mWegPa/">Gulpfile_bower</a> by Andrew Russo (<a href="http://codepen.io/russspruce">@russspruce</a>) on <a href="http://codepen.io">CodePen</a>.</p>
+<script async src="https://production-assets.codepen.io/assets/embed/ei.js"></script>
+
+</div>
+
+<div class="container info_text">
+Now that we have a good set-up of our front end code, let’s finally get started on creating the server side calls that will get us the information we need.  To start, we will need to build our servers and have them sync with our app.  To do this, we will need to create a connection that will allow us to update the files that are on the server, and to have reload and sync with our browser if necessary.  This can be achieved by installing the package BrowserSync.</div>
+<div class="container">
+  <pre>
+$ npm install browser-sync --save-dev</pre>
+</div>
+<div class="container info_text">
+Continuing with what we have done with previous packages, we will need to add a variable and a task to our gulpfile.</div>
+
+<div class="container">
+  <pre>
+var browserSync = require(‘browser-sync').create();
+
+gulp.task('serve', function() {
+  browserSync.init({
+    server: {
+      baseDir: "./",
+      index: "index.html"
+    }
+  });</pre></div>
+<div class="container info_text">
+The task will tell the server that we want to start in the directory we are currently in, and the file that we wish for the app to start on, in this case being index.html.  Now whenever we start gulp serve, it will run both the app and the server.
+<br><br>
+But since we are working with an app that will constantly be updating with new information, we need to have it so that the server can replace the files and reload the browser whenever it detects any changes.  This can be done by using gulp.watch for js files and bower.js, changing the task to look like this:
+</div>
+<div class="container">
+  <pre>
+gulp.task('serve', function() {
+  browserSync.init({
+    server: {
+      baseDir: "./",
+      index: "index.html"
+    }
+  });
+
+  gulp.watch(['js/*.js'], ['jsBuild']);
+  gulp.watch(['bower.json'], ['bowerBuild']);
+
+});</pre></div>
+<div class="container info_text">
+Whenever a change is detected, it will trigger the corresponding tasks to allow browserSync.  Let’s go ahead and create the following tasks:
+</div>
+<div class="container">
+  <pre>
+gulp.task('jsBuild', ['jsBrowserify', 'jshint'], function(){
+  browserSync.reload();
+});
+
+
+gulp.task('bowerBuild', ['bower'], function(){
+  browserSync.reload();
+});</pre></div>
+<div class="container">
+We can make as many tasks that would trigger a reload as we wish. So we shall add one more that will allow the browser to reset whenever a change is made to an html file.  As a result, all of our tasks should look like this:
+</div>
+<div class="container">
+  <pre>
+gulp.task('serve', function() {
+  browserSync.init({
+    server: {
+      baseDir: "./",
+      index: "index.html"
+    }
+  });
+
+  gulp.watch(['js/*.js'], ['jsBuild']);
+  gulp.watch(['bower.json'], ['bowerBuild']);
+  gulp.watch(['*.html'], ['htmlBuild']);
+
+});
+
+gulp.task('htmlBuild', function() {
+  browserSync.reload();
+});
+
+gulp.task('jsBuild', ['jsBrowserify', 'jshint'], function(){
+  browserSync.reload();
+});
+
+gulp.task('bowerBuild', ['bower'], function(){
+  browserSync.reload();
+});</pre></div>
+<div class="container info_text">
+But looking at it now, we may realize that our page seems a bit bare.  To help with this, we can add a bit of styling using Sass(syntactically awesome stylesheets).  To do this, we will have to add a few programs to our computer.  First, make sure homebrew is up to date by entering the following into the command line:</div>
+<div class="container">
+  <pre>
+$ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)”</pre></div>
+<div class="container info_text">
+Follow up by installing Ruby:
+</div>
+<div class="container">
+  <pre>
+$ ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)”</pre></div>
+<div class="container info_text">
+Finally, we can install Sass:</div>
+<div class="container">
+  <pre>
+$ gem install sass
+</pre></div>
+<div class="container info_text">
+Now that we have Sass on our computers, we can add them to our gulpfile along with the source map with a single command line entry:</div>
+<div class="container">
+</pre>
+$ npm install gulp-sass gulp-sourcemaps —save-dev
+</pre></div>
+<div class="container info_text">
+As always, we should require them in our gulp file and create a task.</div>
+<div class="container">
+  <pre>
+var sass = require('gulp-sass');
+var sourcemaps = require(‘gulp-sourcemaps');
+
+[...]
+
+gulp.task('cssBuild', function() {
+  return gulp.src(['scss/*.scss'])
+    .pipe(sourcemaps.init())
+    .pipe(sass())
+    .pipe(sourcemaps.write())
+    .pipe(gulp.dest('./build/css'))
+    .pipe(browserSync.stream());
+});</pre></div>
+
+<div class="container info_text">
+You may noticed that we added browserSync to the end of this task, so that it will know to update overtime as updates are made.  We will have to create the corresponding gulp.watch
+task:</div>
+<div class="container">
+  <pre>
+gulp.watch(["scss/*.scss"], [‘cssBuild']);
+</pre></div>
+<div class="container info_text">
+Along with this, let’s go ahead and update our build gulp.task:
+</div>
+<div class="container">
+  <pre>
+gulp.task('build', ['clean'], function(){
+  if (buildProduction) {
+    gulp.start('minifyScripts');
+  } else {
+    gulp.start('jsBrowserify');
+  }
+  gulp.start('bower');
+  gulp.start('cssBuild');
+});</pre></div>
+<div class="container info_text">
+We will need to create a folder, scss, to host our files.  In there, the scss will differ from css, as we can now nest our style for buttons and colors within one another, making it easier for us to create styling.<br><br>
+Here is one simple example that we will place in our SCSS folder of our project:
+</div>
+<div class="container">
+  <pre>
+    $blue : #1F5EA3;
+    $orange : #EC722F;
+    $lightblue : #4A7ABA;
+
+    body {
+      background-color: $blue;
+      h1 {
+        text-align: center;
+        color: $orange;
+        margin-bottom: 40px;
+      }
+
+      .showGithub {
+        background-color: white;
+        border-radius: 10px;
+        padding: 40px;
+        margin-top: 20px;
+      }
+      .gitSearch {
+        background-color: white;
+        border-radius: 10px;
+        padding: 5px;
+
+        input{
+          color: $lightblue;
+        }
+      }
+
+    }</pre>
+</div>
+
+<div class="container info_text">
+Now, the completion of the server’s ability to update with new changes to multiple files, we can now begin working on building our javascript files.  As stated before, we will be creating two files: an interface js for the frontend, and a backend that will host our object.
+<br><br>
+At the beginning of our object file, create a variable that will hold our API key:</div>
+<div class="container">
+  <pre>
+var apiKey = “API_KEY_HERE”;</pre></div>
+<div class="container info_text">
+The purpose behind our object is that it will perform all the actions of fetching the JSON data, and exporting it to our interface.  To allow this export to happen, we need to create the function:
+</div>
+<div class="container">
+  <pre>
+exports.getRepos = function(){
+};</pre></div>
+
+<div class="container info_text">
+Next for out github-interface.js, let’s create our jQuery function that will pass the username into our code.  Within the function, we will have it so when the user searches for a user, it will create a variable that will store our username, and create the base of the object that we will be searching for in the web API:
+</div>
+<div class="container">
+  <pre>
+$(document).ready(function() {
+ var githubInfo = new getRepos();
+ $('#githubSearch').click(function() {
+    var username = $('#username').val();
+    $(‘#username').val("");
+    githubInfo.getAllRepos(username, displayRepos);
+
+  });
+});
+</pre></div>
+<div class="container info_text">
+This will allow the program to grab the inputted username, but now we need to pass it in our Object file, github.js.</div>
+
+
+
+<div class="container info_text">
+With the export set up, we should now decide on what JSON data we would like to have displayed.  we can do this by combining our API key, username, and the github call to have a GET response:</div>
+<div class="container">
+<pre>
+https://api.github.com/users/'+ username + ‘?access_token=xxxxxxxxxxxx</pre></div>
+<div class="container info_text">
+This call will allow us to be able to get a JSON response on a single user.<br>  Here is an example:</div>
+
+<div class="container"><pre>
+   {
+    "login": "russoa",
+    "id": 25980541,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/25980541?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/russoa",
+    "html_url": "https://github.com/russoa",
+    "followers_url": "https://api.github.com/users/russoa/followers",
+    "following_url": "https://api.github.com/users/russoa/following{/other_user}",
+    "gists_url": "https://api.github.com/users/russoa/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/russoa/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/russoa/subscriptions",
+    "organizations_url": "https://api.github.com/users/russoa/orgs",
+    "repos_url": "https://api.github.com/users/russoa/repos",
+    "events_url": "https://api.github.com/users/russoa/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/russoa/received_events",
+    "type": "User",
+    "site_admin": false,
+    "name": "OSU Student",
+    "company": null,
+    "blog": "http://oregonstate.edu",
+    "location": "Portland, OR",
+    "email": null,
+    "hireable": null,
+    "bio": "This is a test profile meant for demoing various code projects.",
+    "public_repos": 0,
+    "public_gists": 0,
+    "followers": 0,
+    "following": 0,
+    "created_at": "2017-02-23T11:53:59Z",
+    "updated_at": "2017-03-01T10:37:16Z"
+  }
+</pre>
+</div>
+<div class="container info_text">
+In order to get the data we want, we will need to use “response” to declare what parts of the data we want.  For now, pull data for repo name, description, last created and updated, and whether the repo has a GH page.  We will take this information, and create a prototype that will get the information asynchronously, and have it so it will append to a class we will set in our HTML:</div>
+<div class="container">
+  <p data-height="350" data-theme-id="0" data-slug-hash="WpwEgb" data-default-tab="js" data-user="russspruce" data-embed-version="2" data-pen-title="GH_prototype" class="codepen">See the Pen <a href="http://codepen.io/russspruce/pen/WpwEgb/">GH_prototype</a> by Andrew Russo (<a href="http://codepen.io/russspruce">@russspruce</a>) on <a href="http://codepen.io">CodePen</a>.</p>
+<script async src="https://production-assets.codepen.io/assets/embed/ei.js"></script></div>
+
+<div class="container info_text">
+By having then(function(response), the code will not run to retrieve the information until it get’s a response back from the servers.  Once that happens, then  will the code start pulling data back from the response, and send that to our github-interface.js file.  For extra measure, we let’s add an error function that will notify us if an error has occurred.  Now, let’s go back to our frontend js and make sure that the two are connected.
+<br><br>
+We now need add the function that will require us to get the response data from our prototype.
+</div>
+<div class="container">
+  <pre>
+var getRepos = require('./../js/github.js').getRepos;</pre></div>
+<div class="container info_text">
+From here, we can start building a callback function, that will take in the information, and allow us to display it on our HTML page.  When making the function, make sure that our data is properly matched so that we can have it populate the proper variables:</div>
+<div class="container"><pre>
+var displayRepos = function(username, profileData) {
+  $('.showGithub').text(""+username+"'s GitHub repositories currently on display: "+profileData+".");
+}</pre></div>
+<div class="container info_text">
+Finally, let’s update our HTML page so that it can display the info in the browser.  It can be done by having a simple div tag with the class “showGithub” so that our callback can be appended:
+</div>
+<div class="container"><pre>
+&lt;!DOCTYPE&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;link rel="stylesheet" href="build/css/styles.css"&gt;
+    &lt;script src="build/js/vendor.min.js"&gt;&lt;/script&gt;
+    &lt;script type="text/javascript" src="build/js/app.js"&gt;&lt;/script&gt;
+    &lt;title&gt;Github Retriever&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div class="container"&gt;
+     &lt;h1&gt;Find Github repositories!&lt;/h1&gt;
+     &lt;div class="gitSearch"&gt;
+       &lt;label for="username"&gt;Enter a username:&lt;/label&gt;
+       &lt;br&gt;
+       &lt;input class="form-control" id="username" type="text" name="username"&gt;
+       &lt;br&gt;
+       &lt;button class="btn" id = "githubSearch"&gt;Search&lt;/button&gt;
+     &lt;/div&gt;
+     &lt;div class="showGithub"&gt;
+     &lt;/div&gt;
+   &lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+</div>
+
+<div class="container info_text">
+And there we have it!  A fully functioning GitHub search program created through various programs using npm and our GitHub API.
+<br><br>
+</div>
+
+
+<div class="container info_text">
+<p>There is one last thing we must do for our program if we ever decide to publish it on GitHub or other repositories, and that is to create an .env file and a .gitignore file</p>
+<h2>Why do we need these files?</h2>
+<p>As mentioned in the beginning, an API key token is specific to each account, and notifies the enterprise how many times it's being used, and for what.  It can be quite troublesome if someone else had the token, and started using it for calls and programs it was intended for.  In order to counter this, we can create a separate file that would allow us to be able to prevent our API key when uploaded to a repository like GitHub, but still be used on a local machine.</p>
+<p>To begin, in the command line create two files: .env and .gitignore:</p>
+<img src="img/env+gitignore.png" width="100%" alt="env/gitignore">
+<p>Now go into our .env file by entering in the command line <span class="command_line">$ open .env</span>.  This will open the file.  In it we will enter this code that will store our API key:</p>
+  <pre>
+exports.apiKey ="XXXXXXXXXXXXXXXXXXXX"
+</pre>
+<p>Once we add that, we must now go back to our github.js file, and replace the variable API key there with the following: </p>
+
+  <pre>
+var apiKey = require('./../.env').apiKey;
+</pre>
+
+<p>This allows us to be able to call upon the API key value stored in our .env file, and properly insert it into our code without any issues thant's to to the code being an asynchronous call.</p>
+<p>Once completed, we can now go ahead and add to our .gitignore file.  The purpose of .gitignore is that it will ignore specific files that we do not wish to add to our repository.  This could be for security reasons, but mainly to prevent our repository from being bloated with extra files like the node module folder, or .DS_Store.  We will add the following:</p>
+  <pre>
+node_modules/
+.DS_Store
+bower_components/
+build/
+tmp/</pre>
+
+<p>Now when we upload our project, or any project to github that has this setup, we will not have to worry about someone stealing the API key, or for it taking up a lot of space in our repository.</p>
+
+<br><br>
+<p>We have now completed our project, and exploring the GitHub API.  Thank you for taking the time to explore, and feel free to use any of the resources provided here to help you with futer projects</p>
+
+<h1>Best of Luck!</h1>
+
+
+<h2>Credits</h2>
+<div class="credit_section">
+<strong>Sources:</strong><br>
+<a href="http://github.com">GitHub</a><br>
+<a href="http://gulpjs.com/">Gulp.js</a><br>
+<a href="https://bower.io/">Bower</a><br>
+<a href="http://sass-lang.com/">Sass</a><br><br>
+
+ <strong>Webpage credits:</strong><br>
+
+<a href="http://getbootstrap.com/">BootStrap:</a> <a href="http://getbootstrap.com/">http://getbootstrap.com/</a><br>
+
+<a href="https://daneden.github.io/animate.css/">Animate.css:</a> <a href="https://daneden.github.io/animate.css/">https://daneden.github.io/animate.css/</a><br>
+
+<a href="http://codepen.io/">CodePen:</a> <a href="http://codepen.io/">http://codepen.io/</a>
+
+
+    </div>
+    <div align="center">
+      <img src="img/end.png" alt="End image">
+    </div>
+
+  </body>
+</html>
