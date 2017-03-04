@@ -6,6 +6,9 @@
     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css'>
     <link rel="stylesheet" href="styles.css" type="text/css">
     <link rel="stylesheet" href="animate.css" type="text/css">
+    <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="script.js" type="text/javascript"></script>
   </head>
   <body>
 
@@ -44,7 +47,7 @@
         <div class="container">
           <div class="row">
             <div class="col-md-4">
-              <ul align="left">
+              <ul align="left" id="key_info" class="hideout">
                 <li>Go to the top corner and select your user icon.</li>
                 <li>In the drop down menu, select <em>Settings</em></li>
                 <li>In <em>Settings</em>, scroll down the left menu until you find the <em>Developers settings</em></li>
@@ -55,7 +58,7 @@
 
             </div>
             <div class="col-md-8">
-              <img src="img/token_form.png" alt="token_menu" width="400px">
+              <img src="img/token_form.png" alt="token_menu" width="400px" id="key_form" class="hideout">
 
             </div>
 
@@ -64,9 +67,9 @@
         </div>
 
         <h2>What is an API Key?</h2>
-        <p>The API Key is a special token that allows for access to the library and resources of the API.  Each API key is different as it is used to identify who is accessing the information, and how many calls are made.<br>For our API Key, you can see below that we have generated one, and that we will have to copy it before we exit out.  If we lose the key, we will need to generate a new one for security reasons.</p><br>
+        <p>The API Key is a special token that allows for access to the library and resources of the API.  Each API key token is different as it is used to identify who is accessing the information, and how many calls are made.<br>For our API key token, you can see below that we have generated one, and that we will have to copy it before we exit out.  If we lose the token, we will need to generate a new one for security reasons.</p><br>
 
-        <img src="img/api-key.png" alt="api_key" width="100%">
+        <img src="img/api-key.png" alt="api_key" title="Token has been reset for safety" width="100%">
         <br><br>
         <p>We will use this API Key in a moment, but for now, let's go ahead and start creating our web application.</p>
 
@@ -81,8 +84,7 @@
             │   └── github.scss
             ├── scss/
             │   └── styles.scss
-            └── index.html
-          </pre><br>
+            └── index.html</pre><br>
         For now, don't worry about what the files will be, we will get to those soon.  For now, in the command line enter in: <span class="command_line">$npm init</span>.<br>Go thorugh the list entering in the info, and in the end, you will have a package.json file that looks like the following: </p>
 
         <pre>{
@@ -118,13 +120,13 @@ Next, we will need to install our next package, browserify.
 <br>
 </div>
 <div class="container">
-<pre>
+<pre id="browserify" class="hideout">
 $ npm install browserify --save-dev
 </pre>
 </div>
 <div class="container info_text">
 Browserify allows for export and required to be translated from the browser into javascript, which will be used by node.js to use that info to execute our call.
-
+<br>
 
 Along with browserify, we will install several other modules that will be used for this project, and can be used in other projects as well.  Go ahead and enter in the following into the command line:
 </div>
@@ -138,7 +140,7 @@ $ npm install gulp-util --save-dev
 $ npm install del --save-dev
 $ npm install jshint --save-dev
 $ npm install gulp-jshint --save-dev
-  </pre>
+</pre>
 </div>
 
 
@@ -187,15 +189,14 @@ Next, let’s create our form for submitting a username.  Once submitted, it wil
        &lt;button class="btn" id = "githubSearch"&gt;Search&lt;/button&gt;
      &lt;/div&gt;
    &lt;/div&gt;
-  </pre>
+</pre>
 </div>
 <div class="container info_text">
 As you may have noticed, for our &lt;script&gt; tag, we have in the code the following:
 </div>
 <div class="container">
   <pre>
-  &lt;script type="text/javascript" src=“build/js/app.js"&gt;&lt;/script&gt;
-  </pre>
+  &lt;script type="text/javascript" src=“build/js/app.js"&gt;&lt;/script&gt;</pre>
 </div>
 <div class="container info_text">
 Thanks to having Browserfy, we only need to make one call to our js file to have it run.
@@ -239,7 +240,7 @@ We should now have a solid HTML page:
 But once again, we are starting to have a lot of &lt;script&gt; and &lt;link&gt; tags in our HTML page, which can slow us down.  To help solve this, we can use npm to  install bower-files to help.
 </div>
 <div class="container">
-  <pre>
+  <pre id="bower_files" class="hideout">
 $ npm install bower-files --save-dev</pre>
 </div>
 <div class="container info_text">
@@ -329,7 +330,7 @@ After all of this, we should have our new gulpfile.js that should look like so:
 <div class="container info_text">
 Now that we have a good set-up of our front end code, let’s finally get started on creating the server side calls that will get us the information we need.  To start, we will need to build our servers and have them sync with our app.  To do this, we will need to create a connection that will allow us to update the files that are on the server, and to have reload and sync with our browser if necessary.  This can be achieved by installing the package BrowserSync.</div>
 <div class="container">
-  <pre>
+  <pre id="browser_sync" class="hideout">
 $ npm install browser-sync --save-dev</pre>
 </div>
 <div class="container info_text">
@@ -411,18 +412,18 @@ gulp.task('bowerBuild', ['bower'], function(){
 <div class="container info_text">
 But looking at it now, we may realize that our page seems a bit bare.  To help with this, we can add a bit of styling using Sass(syntactically awesome stylesheets).  To do this, we will have to add a few programs to our computer.  First, make sure homebrew is up to date by entering the following into the command line:</div>
 <div class="container">
-  <pre>
+  <pre id="homebrew" class="hideout">
 $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)”</pre></div>
 <div class="container info_text">
 Follow up by installing Ruby:
 </div>
 <div class="container">
-  <pre>
+  <pre id="ruby" class="hideout">
 $ ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)”</pre></div>
 <div class="container info_text">
 Finally, we can install Sass:</div>
 <div class="container">
-  <pre>
+  <pre id="sass" class="hideout">
 $ gem install sass
 </pre></div>
 <div class="container info_text">
